@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/ketchoop/flora"
 	"github.com/urfave/cli"
@@ -26,7 +27,7 @@ func main() {
 
 				upgrader := flora.InitTerraformUpgrader(version)
 
-				upgrader.Run()
+				upgrader.Run(time.Now())
 
 				return nil
 			},
@@ -45,7 +46,7 @@ func main() {
 
 				upgrader := flora.InitTerraformUpgrader(version)
 
-				upgrader.Run()
+				upgrader.Run(time.Now())
 
 				return nil
 			},

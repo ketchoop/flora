@@ -14,6 +14,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "flora"
 	app.Usage = "Simple app to upgrade your terraform"
+	app.Version = "0.0.1"
 	app.Commands = []cli.Command{
 		{
 			Name:  "upgrade",

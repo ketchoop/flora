@@ -38,7 +38,7 @@ func InitTerraformUpgrader(version string) *TerraformUpgrader {
 //}
 func timeTrack(start time.Time, action string) {
 	elapsed := time.Since(start)
-	log.Printf("Terraform %s in %s\n\n", action, elapsed)
+	fmt.Printf("Terraform %s in %s\n\n", action, elapsed)
 }
 
 func (t TerraformUpgrader) DownloadTerraform() error {
@@ -50,6 +50,7 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 	if err != nil {
 		return err
 	}
+	defer r.Body.Close()
 
 	if r.StatusCode != 200 {
 		return errors.New("can't download terraform")
@@ -63,7 +64,6 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 
 	defer zipFile.Close()
 
-	defer r.Body.Close()
 
 	_, err = io.Copy(zipFile, r.Body)
 
@@ -101,13 +101,13 @@ func (t TerraformUpgrader) InstallNewTerraform() error {
 }
 
 func (t TerraformUpgrader) Run(startTime time.Time) error {
-	log.Printf("Step 1/3: Downloading Terraform %s to %s\n", t.Version, tfDownloadPath)
+	fmt.Printf("Step 1/3: Downloading Terraform %s to %s\n", t.Version, tfDownloadPath)
 	if err := t.DownloadTerraform(); err != nil {
 		log.Fatal(err)
 	}
 	timeTrack(startTime, "Downloaded")
 
-	log.Printf("Step 2/3: Unpacking Terraform %s to %s\n", t.Version, tfDownloadPath)
+	fmt.Printf("Step 2/3: Unpacking Terraform %s to %s\n", t.Version, tfDownloadPath)
 
 	startTime = time.Now()
 	if err := t.UnzipAndClean(); err != nil {
@@ -115,7 +115,7 @@ func (t TerraformUpgrader) Run(startTime time.Time) error {
 	}
 	timeTrack(startTime, "Unpacked")
 
-	log.Println("Step 3/3: Installing Terraform to /usr/bin/")
+	fmt.Println("Step 3/3: Installing Terraform to /usr/bin/")
 
 	startTime = time.Now()
 	if err := t.InstallNewTerraform(); err != nil {

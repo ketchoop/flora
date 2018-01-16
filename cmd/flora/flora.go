@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/AntonTumasov/flora"
+	"github.com/ketchoop/flora"
 	"github.com/urfave/cli"
 )
 

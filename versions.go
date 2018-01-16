@@ -2,24 +2,28 @@ package flora
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"sort"
 
 	version "github.com/hashicorp/go-version"
 )
 
+//CheckResponse is for returning version
+type CheckResponse struct {
+	CurrentVersion string `json:"current_version"`
+}
+
 const releasesIndexURL string = "https://releases.hashicorp.com/terraform/index.json"
 
+//GetLatestVersion returns latest version from URL
 func GetLatestVersion() (string, error) {
-	type CheckResponse struct {
-		CurrentVersion string `json:"current_version"`
-	}
 
 	checkResponse := CheckResponse{}
 
 	r, err := http.Get(tfCheckpointURL)
 	if err != nil {
-		return "", err
+		log.Fatal(err)
 	}
 
 	defer r.Body.Close()
@@ -27,12 +31,13 @@ func GetLatestVersion() (string, error) {
 	err = json.NewDecoder(r.Body).Decode(&checkResponse)
 
 	if err != nil {
-		return "", err
+		log.Fatal(err)
 	}
 
 	return checkResponse.CurrentVersion, nil
 }
 
+//ListAllVersions returns slice of go-versions
 func ListAllVersions() ([]*version.Version, error) {
 	var versions []*version.Version
 	versionsWrapper := struct {

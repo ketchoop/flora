@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"time"
 )
 
 const (
@@ -35,11 +36,16 @@ func InitTerraformUpgrader(version string) *TerraformUpgrader {
 //
 //	return t.Version == oldTfVersion
 //}
+func timeTrack(start time.Time, action string) {
+	elapsed := time.Since(start)
+	log.Printf("Terraform %s in %s\n\n", action, elapsed)
+}
 
 func (t TerraformUpgrader) DownloadTerraform() error {
 	tfFileURL := fmt.Sprintf(tfBaseURL, t.Version, t.tfFileSuffix)
 
 	r, err := http.Get(tfFileURL)
+	// fmt.Println(r)
 
 	if err != nil {
 		return err
@@ -94,22 +100,28 @@ func (t TerraformUpgrader) InstallNewTerraform() error {
 	return nil
 }
 
-func (t TerraformUpgrader) Run() error {
-	log.Print("Downloading Terraform " + t.Version)
-
+func (t TerraformUpgrader) Run(startTime time.Time) error {
+	log.Printf("Step 1/3: Downloading Terraform %s to %s\n", t.Version, tfDownloadPath)
 	if err := t.DownloadTerraform(); err != nil {
 		log.Fatal(err)
 	}
+	timeTrack(startTime, "Downloaded")
 
-	log.Print("Unpacking Terraform " + t.Version)
+	log.Printf("Step 2/3: Unpacking Terraform %s to %s\n", t.Version, tfDownloadPath)
 
+	startTime = time.Now()
 	if err := t.UnzipAndClean(); err != nil {
 		log.Fatal(err)
 	}
+	timeTrack(startTime, "Unpacked")
 
+	log.Println("Step 3/3: Installing Terraform to /usr/bin/")
+
+	startTime = time.Now()
 	if err := t.InstallNewTerraform(); err != nil {
 		log.Fatal(err)
 	}
+	timeTrack(startTime, "Installed")
 
 	return nil
 }

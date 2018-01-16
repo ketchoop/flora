@@ -2,8 +2,8 @@ package flora
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+	// "os/exec"
 	"sort"
 
 	version "github.com/hashicorp/go-version"
@@ -22,17 +22,13 @@ func GetLatestVersion() (string, error) {
 	checkResponse := CheckResponse{}
 
 	r, err := http.Get(tfCheckpointURL)
-	if err != nil {
-		log.Fatal(err)
-	}
+	ErrorHandler(err)
 
 	defer r.Body.Close()
 
 	err = json.NewDecoder(r.Body).Decode(&checkResponse)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	ErrorHandler(err)
 
 	return checkResponse.CurrentVersion, nil
 }

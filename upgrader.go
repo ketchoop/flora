@@ -36,6 +36,7 @@ func InitTerraformUpgrader(version string) *TerraformUpgrader {
 //
 //	return t.Version == oldTfVersion
 //}
+
 func timeTrack(start time.Time, action string) {
 	elapsed := time.Since(start)
 	fmt.Printf("Terraform %s in %s\n\n", action, elapsed)
@@ -47,9 +48,8 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 	r, err := http.Get(tfFileURL)
 	// fmt.Println(r)
 
-	if err != nil {
-		return err
-	}
+	ErrorHandler(err)
+
 	defer r.Body.Close()
 
 	if r.StatusCode != 200 {
@@ -58,18 +58,14 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 
 	zipFile, err := os.Create(tfDownloadPath + "/terraform_" + t.tfFileSuffix + ".zip") // use pathlib
 
-	if err != nil {
-		return err
-	}
+	ErrorHandler(err)
 
 	defer zipFile.Close()
 
 
 	_, err = io.Copy(zipFile, r.Body)
 
-	if err != nil {
-		return err
-	}
+	ErrorHandler(err)
 
 	return nil
 }
@@ -77,9 +73,7 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 func (t TerraformUpgrader) UnzipAndClean() error {
 	_, err := unzip(tfDownloadPath+"/terraform_"+t.tfFileSuffix+".zip", tfDownloadPath) // use pathlib
 
-	if err != nil {
-		return err
-	}
+	ErrorHandler(err)
 
 	return nil
 }
@@ -93,9 +87,7 @@ func (t TerraformUpgrader) InstallNewTerraform() error {
 
 	err = os.Rename(tfDownloadPath+"/terraform", oldTfPath)
 
-	if err != nil {
-		return err
-	}
+	ErrorHandler(err)
 
 	return nil
 }

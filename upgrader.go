@@ -74,6 +74,10 @@ func (t TerraformUpgrader) UnzipAndClean() error {
 		return err
 	}
 
+	if err = os.Remove(t.floraPath + "/terraform_" + t.tfFileSuffix + ".zip"); err != nil {
+		return err
+	}
+
 	os.Rename(t.floraPath+"/terraform", t.floraPath+"/terraform_"+t.tfFileSuffix)
 
 	return nil

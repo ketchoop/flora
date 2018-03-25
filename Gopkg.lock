@@ -8,6 +8,12 @@
   revision = "4fe82ae3040f80a03d04d2cccb5606a626b8e1ee"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "b8bc1bf767474819792c23f32d8286a45736f1c6"
+
+[[projects]]
   name = "github.com/urfave/cli"
   packages = ["."]
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
@@ -16,6 +22,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "de25f305e4655adf7278452a53439399f23545c75e149e0488c75b79018f9641"
+  inputs-digest = "b64c75ea4ac3e857ea9a377f8ffabaf1e949f734c86305dfcc3ae7746c1e34b8"
   solver-name = "gps-cdcl"
   solver-version = 1

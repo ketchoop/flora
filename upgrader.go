@@ -18,25 +18,24 @@ const (
 )
 
 type TerraformUpgrader struct {
-	Version      string
-	tfFileSuffix string // contains version, arch and OS
-	floraPath    string
+	Version   string
+	floraPath string
 }
 
 func InitTerraformUpgrader(version string) *TerraformUpgrader {
 	homeDir, _ := homedir.Dir()
 
-	return &TerraformUpgrader{version, version + "_" + runtime.GOOS + "_" + runtime.GOARCH, homeDir + "/.flora"}
+	return &TerraformUpgrader{version, homeDir + "/.flora"}
 }
 
 func (t TerraformUpgrader) IsDownloadNeeded() bool {
-	_, err := os.Stat(t.floraPath + "/terraform_" + t.tfFileSuffix)
+	_, err := os.Stat(t.floraPath + "/terraform_" + t.Version)
 
 	return os.IsNotExist(err)
 }
 
 func (t TerraformUpgrader) DownloadTerraform() error {
-	tfFileURL := fmt.Sprintf(tfBaseURL, t.Version, t.tfFileSuffix)
+	tfFileURL := fmt.Sprintf(tfBaseURL, t.Version, t.Version+"_"+runtime.GOOS+"_"+runtime.GOARCH)
 
 	r, err := http.Get(tfFileURL)
 
@@ -48,7 +47,7 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 		return errors.New("can't download terraform")
 	}
 
-	zipFile, err := os.Create(t.floraPath + "/terraform_" + t.tfFileSuffix + ".zip") // use pathlib
+	zipFile, err := os.Create(t.floraPath + "/terraform_" + t.Version + ".zip") // use pathlib
 
 	if err != nil {
 		return err
@@ -68,17 +67,17 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 }
 
 func (t TerraformUpgrader) UnzipAndClean() error {
-	_, err := unzip(t.floraPath+"/terraform_"+t.tfFileSuffix+".zip", t.floraPath) //TODO: use pathlib
+	_, err := unzip(t.floraPath+"/terraform_"+t.Version+".zip", t.floraPath) //TODO: use pathlib
 
 	if err != nil {
 		return err
 	}
 
-	if err = os.Remove(t.floraPath + "/terraform_" + t.tfFileSuffix + ".zip"); err != nil {
+	if err = os.Remove(t.floraPath + "/terraform_" + t.Version + ".zip"); err != nil {
 		return err
 	}
 
-	os.Rename(t.floraPath+"/terraform", t.floraPath+"/terraform_"+t.tfFileSuffix)
+	os.Rename(t.floraPath+"/terraform", t.floraPath+"/terraform_"+t.Version)
 
 	return nil
 }
@@ -88,9 +87,9 @@ func (t TerraformUpgrader) InstallNewTerraform() error {
 		os.Remove(t.floraPath + "/bin/terraform")
 	}
 
-	log.Print("Adding symlink " + t.floraPath + "/terraform_" + t.tfFileSuffix + "->" + t.floraPath + "/bin/terraform")
+	log.Print("Adding symlink " + t.floraPath + "/terraform_" + t.Version + "->" + t.floraPath + "/bin/terraform")
 
-	if err := os.Symlink(t.floraPath+"/terraform_"+t.tfFileSuffix, t.floraPath+"/bin/terraform"); err != nil {
+	if err := os.Symlink(t.floraPath+"/terraform_"+t.Version, t.floraPath+"/bin/terraform"); err != nil {
 		return err
 	}
 

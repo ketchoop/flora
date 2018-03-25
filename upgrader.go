@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"runtime"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -47,7 +48,7 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 		return errors.New("can't download terraform")
 	}
 
-	zipFile, err := os.Create(t.floraPath + "/terraform_" + t.Version + ".zip") // use pathlib
+	zipFile, err := os.Create(path.Join(t.floraPath, "terraform_"+t.Version+".zip")) // use pathlib
 
 	if err != nil {
 		return err
@@ -67,29 +68,31 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 }
 
 func (t TerraformUpgrader) UnzipAndClean() error {
-	_, err := unzip(t.floraPath+"/terraform_"+t.Version+".zip", t.floraPath) //TODO: use pathlib
+	_, err := unzip(path.Join(t.floraPath, "terraform_"+t.Version+".zip"), t.floraPath)
 
 	if err != nil {
 		return err
 	}
 
-	if err = os.Remove(t.floraPath + "/terraform_" + t.Version + ".zip"); err != nil {
+	if err = os.Remove(path.Join(t.floraPath, "terraform_"+t.Version+".zip")); err != nil {
 		return err
 	}
 
-	os.Rename(t.floraPath+"/terraform", t.floraPath+"/terraform_"+t.Version)
+	os.Rename(path.Join(t.floraPath, "terraform"), path.Join(t.floraPath, "terraform_"+t.Version))
 
 	return nil
 }
 
 func (t TerraformUpgrader) InstallNewTerraform() error {
-	if _, err := os.Lstat(t.floraPath + "/bin/terraform"); err == nil {
-		os.Remove(t.floraPath + "/bin/terraform")
+	floraBinPath := path.Join(t.floraPath, "bin", "terraform")
+
+	if _, err := os.Lstat(floraBinPath); err == nil {
+		os.Remove(floraBinPath)
 	}
 
-	log.Print("Adding symlink " + t.floraPath + "/terraform_" + t.Version + "->" + t.floraPath + "/bin/terraform")
+	log.Print("Adding symlink " + path.Join(t.floraPath, "terraform_"+t.Version) + "->" + floraBinPath)
 
-	if err := os.Symlink(t.floraPath+"/terraform_"+t.Version, t.floraPath+"/bin/terraform"); err != nil {
+	if err := os.Symlink(path.Join(t.floraPath, "terraform_"+t.Version), floraBinPath); err != nil {
 		return err
 	}
 

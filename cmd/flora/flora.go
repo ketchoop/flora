@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	version "github.com/hashicorp/go-version"
 	"github.com/ketchoop/flora"
 	"github.com/urfave/cli"
 )
@@ -59,15 +60,28 @@ func main() {
 					Value: 10,
 					Usage: "Number of versions print on screen",
 				},
+				cli.BoolFlag{
+					Name:  "local, l",
+					Usage: "Show only installed versions of Terraform",
+				},
 			},
 			Action: func(c *cli.Context) error {
-				versions, err := flora.ListAllVersions()
+				var versions []*version.Version
+				var err error
+
+				if c.Bool("local") {
+					versions, err = flora.ListLocalVersions()
+				} else {
+					versions, err = flora.ListRemoteVersions()
+				}
 
 				if err != nil {
 					log.Fatal(err)
 				}
 
-				versions = versions[len(versions)-c.Int("num"):]
+				if len(versions) >= c.Int("num") {
+					versions = versions[len(versions)-c.Int("num"):]
+				}
 
 				for _, version := range versions {
 					fmt.Printf("%s\n", version)

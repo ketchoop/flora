@@ -18,19 +18,25 @@ const (
 	tfCheckpointURL string = "https://checkpoint-api.hashicorp.com/v1/check/terraform"
 )
 
+var floraPath string
+
+func init() {
+	homeDir, _ := homedir.Dir()
+
+	floraPath = path.Join(homeDir, ".flora")
+}
+
 type TerraformUpgrader struct {
-	Version   string
-	floraPath string
+	Version string
 }
 
 func InitTerraformUpgrader(version string) *TerraformUpgrader {
-	homeDir, _ := homedir.Dir()
 
-	return &TerraformUpgrader{version, homeDir + "/.flora"}
+	return &TerraformUpgrader{version}
 }
 
 func (t TerraformUpgrader) IsDownloadNeeded() bool {
-	_, err := os.Stat(t.floraPath + "/terraform_" + t.Version)
+	_, err := os.Stat(floraPath + "/terraform_" + t.Version)
 
 	return os.IsNotExist(err)
 }
@@ -48,7 +54,7 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 		return errors.New("can't download terraform")
 	}
 
-	zipFile, err := os.Create(path.Join(t.floraPath, "terraform_"+t.Version+".zip")) // use pathlib
+	zipFile, err := os.Create(path.Join(floraPath, "terraform_"+t.Version+".zip")) // use pathlib
 
 	if err != nil {
 		return err
@@ -68,31 +74,31 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 }
 
 func (t TerraformUpgrader) UnzipAndClean() error {
-	_, err := unzip(path.Join(t.floraPath, "terraform_"+t.Version+".zip"), t.floraPath)
+	_, err := unzip(path.Join(floraPath, "terraform_"+t.Version+".zip"), floraPath)
 
 	if err != nil {
 		return err
 	}
 
-	if err = os.Remove(path.Join(t.floraPath, "terraform_"+t.Version+".zip")); err != nil {
+	if err = os.Remove(path.Join(floraPath, "terraform_"+t.Version+".zip")); err != nil {
 		return err
 	}
 
-	os.Rename(path.Join(t.floraPath, "terraform"), path.Join(t.floraPath, "terraform_"+t.Version))
+	os.Rename(path.Join(floraPath, "terraform"), path.Join(floraPath, "terraform_"+t.Version))
 
 	return nil
 }
 
 func (t TerraformUpgrader) InstallNewTerraform() error {
-	floraBinPath := path.Join(t.floraPath, "bin", "terraform")
+	floraBinPath := path.Join(floraPath, "bin", "terraform")
 
 	if _, err := os.Lstat(floraBinPath); err == nil {
 		os.Remove(floraBinPath)
 	}
 
-	log.Print("Adding symlink " + path.Join(t.floraPath, "terraform_"+t.Version) + "->" + floraBinPath)
+	log.Print("Adding symlink " + path.Join(floraPath, "terraform_"+t.Version) + "->" + floraBinPath)
 
-	if err := os.Symlink(path.Join(t.floraPath, "terraform_"+t.Version), floraBinPath); err != nil {
+	if err := os.Symlink(path.Join(floraPath, "terraform_"+t.Version), floraBinPath); err != nil {
 		return err
 	}
 

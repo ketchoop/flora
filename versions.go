@@ -3,7 +3,10 @@ package flora
 import (
 	"encoding/json"
 	"net/http"
+	"path"
+	"path/filepath"
 	"sort"
+	"strings"
 
 	version "github.com/hashicorp/go-version"
 )
@@ -33,7 +36,33 @@ func GetLatestVersion() (string, error) {
 	return checkResponse.CurrentVersion, nil
 }
 
-func ListAllVersions() ([]*version.Version, error) {
+func ListLocalVersions() ([]*version.Version, error) {
+	var versions []*version.Version
+	var rawVersions []string
+
+	tfFilesList, err := filepath.Glob(path.Join(floraPath, "/terraform_*"))
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, tfFile := range tfFilesList {
+		rawVersions = append(
+			rawVersions,
+			tfFile[strings.LastIndex(tfFile, "_")+1:],
+		)
+	}
+
+	versions = make([]*version.Version, len(rawVersions))
+
+	for i, ver := range rawVersions {
+		versions[i], _ = version.NewVersion(ver)
+	}
+
+	return versions, nil
+}
+
+func ListRemoteVersions() ([]*version.Version, error) {
 	var versions []*version.Version
 	versionsWrapper := struct {
 		Versions map[string]interface{}

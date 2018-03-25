@@ -25,7 +25,7 @@ func main() {
 					log.Fatal(err)
 				}
 
-				upgrader := flora.InitTerraformUpgrader(version)
+				upgrader := flora.TerraformUpgrader{version}
 
 				upgrader.Run()
 
@@ -44,7 +44,7 @@ func main() {
 					return nil
 				}
 
-				upgrader := flora.InitTerraformUpgrader(version)
+				upgrader := flora.TerraformUpgrader{version}
 
 				upgrader.Run()
 

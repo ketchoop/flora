@@ -30,11 +30,6 @@ type TerraformUpgrader struct {
 	Version string
 }
 
-func InitTerraformUpgrader(version string) *TerraformUpgrader {
-
-	return &TerraformUpgrader{version}
-}
-
 func (t TerraformUpgrader) IsDownloadNeeded() bool {
 	_, err := os.Stat(floraPath + "/terraform_" + t.Version)
 

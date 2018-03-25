@@ -30,9 +30,9 @@ func InitTerraformUpgrader(version string) *TerraformUpgrader {
 }
 
 func (t TerraformUpgrader) IsDownloadNeeded() bool {
-	_, err := os.Stat(t.floraPath + "/terraform_" + t.Version)
+	_, err := os.Stat(t.floraPath + "/terraform_" + t.tfFileSuffix)
 
-	return os.IsExist(err)
+	return os.IsNotExist(err)
 }
 
 func (t TerraformUpgrader) DownloadTerraform() error {
@@ -98,6 +98,7 @@ func (t TerraformUpgrader) InstallNewTerraform() error {
 }
 
 func (t TerraformUpgrader) Run() error {
+	fmt.Print(t.IsDownloadNeeded())
 	if t.IsDownloadNeeded() {
 		log.Print("Downloading Terraform " + t.Version)
 

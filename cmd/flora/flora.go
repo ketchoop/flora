@@ -33,8 +33,8 @@ func main() {
 			},
 		},
 		{
-			Name:      "install",
-			Usage:     "Install specific terraform version",
+			Name:      "use",
+			Usage:     "Download(when it's needed) and use specific terraform version",
 			ArgsUsage: "TERRAFORM_VERSION",
 			Action: func(c *cli.Context) error {
 				version := c.Args().First()

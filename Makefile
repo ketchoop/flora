@@ -2,7 +2,7 @@ VERSION ?= $(git describe --tags)
 DIST_DIRS := find * -type d -exec
 
 init:
-	go get -u github.com/golang/dep
+	go get -u github.com/golang/dep/cmd/dep
 	dep ensure
 
 build:

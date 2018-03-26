@@ -4,6 +4,10 @@
 *.so
 *.dylib
 
+# Ignore dist
+dist
+flora
+
 # Test binary, build with `go test -c`
 *.test
 

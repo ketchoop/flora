@@ -1,0 +1,28 @@
+language: go
+
+go:
+  - "1.9"
+  - "1.10"
+  - "master" 
+
+matrix:
+  allow_failures:
+    - go: master
+  fast_finish: true
+
+before_script:
+- make init
+
+script:
+- make vet
+- make dist
+
+deploy:
+  provider: releases
+  api_key: "$GITHUB_RELEASE_TOKEN"
+  file:
+  - dist/*.tar.gz
+  - dist/*.zip
+  on:
+    tags: true
+

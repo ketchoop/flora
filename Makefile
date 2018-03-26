@@ -2,7 +2,7 @@ VERSION ?= $(git describe --tags)
 DIST_DIRS := find * -type d -exec
 
 init:
-	go get -u github.com/laher/goxc
+	go get -u github.com/golang/dep
 	dep ensure
 
 build:
@@ -30,6 +30,6 @@ dist: pre-dist build-all
 vet:
 	go tool vet .
 
-all: bootastrap vet dist 
+all: vet dist
 
 .PHONY: init build build-darwin build-win build-all dist vet

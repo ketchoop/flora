@@ -101,7 +101,6 @@ func (t TerraformUpgrader) InstallNewTerraform() error {
 }
 
 func (t TerraformUpgrader) Run() error {
-	fmt.Print(t.IsDownloadNeeded())
 	if t.IsDownloadNeeded() {
 		log.Print("Downloading Terraform " + t.Version)
 

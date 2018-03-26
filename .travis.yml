@@ -20,6 +20,7 @@ script:
 deploy:
   provider: releases
   api_key: "$GITHUB_RELEASE_TOKEN"
+  file_glob: true
   file:
   - dist/*.tar.gz
   - dist/*.zip

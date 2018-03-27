@@ -80,6 +80,12 @@ func main() {
 					log.Fatal(err)
 				}
 
+				if len(versions) == 0 && c.Bool("local") {
+					fmt.Printf("There is no packages installed locally")
+
+					return nil
+				}
+
 				if len(versions) >= c.Int("num") {
 					versions = versions[len(versions)-c.Int("num"):]
 				}

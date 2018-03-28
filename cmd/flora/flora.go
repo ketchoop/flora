@@ -92,6 +92,23 @@ func main() {
 					Usage: "Show only installed versions of Terraform",
 				},
 			},
+			Subcommands: []cli.Command{
+				{
+					Name:  "current",
+					Usage: "Show currently used version of terraform",
+					Action: func(c *cli.Context) error {
+						currentVer, err := flora.GetCurrentVersion()
+
+						if err != nil {
+							log.Fatal(err)
+						}
+
+						fmt.Println("Currently used terraform version is " + currentVer)
+
+						return nil
+					},
+				},
+			},
 			Action: func(c *cli.Context) error {
 				var versions []*version.Version
 				var err error

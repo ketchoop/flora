@@ -3,6 +3,7 @@ package flora
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
 	"sort"
@@ -34,6 +35,14 @@ func GetLatestVersion() (string, error) {
 	}
 
 	return checkResponse.CurrentVersion, nil
+}
+
+func GetCurrentVersion() (version string, err error) {
+	link, err := os.Readlink(path.Join(floraPath, "bin", "terraform"))
+
+	version = link[strings.LastIndex(link, "_")+1:]
+
+	return
 }
 
 func ListLocalVersions() ([]*version.Version, error) {

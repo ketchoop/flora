@@ -34,6 +34,32 @@ func main() {
 			},
 		},
 		{
+			Name:      "download",
+			Usage:     "Download specific Terraform version",
+			ArgsUsage: "TERRAFORM_VERSION",
+			Action: func(c *cli.Context) error {
+				if c.NArg() == 0 {
+					cli.ShowSubcommandHelp(c)
+
+					return nil
+				}
+
+				version := c.Args().First()
+
+				upgrader := flora.TerraformUpgrader{version}
+
+				log.Print("Downloading Terraform " + version)
+
+				if err := upgrader.DownloadTerraform(); err != nil {
+					log.Fatal(err)
+				}
+
+				log.Print("Terraform " + version + " was succesfully downloaded")
+
+				return nil
+			},
+		},
+		{
 			Name:      "use",
 			Usage:     "Download(when it's needed) and use specific terraform version",
 			ArgsUsage: "TERRAFORM_VERSION",

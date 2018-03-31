@@ -15,6 +15,7 @@ func main() {
 	app.Name = "flora"
 	app.Usage = "Simple app to upgrade your terraform"
 	app.Version = "0.1.0"
+	app.EnableBashCompletion = true
 	app.Commands = []cli.Command{
 		{
 			Name:  "upgrade",
@@ -34,9 +35,10 @@ func main() {
 			},
 		},
 		{
-			Name:      "download",
-			Usage:     "Download specific Terraform version",
-			ArgsUsage: "TERRAFORM_VERSION",
+			Name:         "download",
+			Usage:        "Download specific Terraform version",
+			ArgsUsage:    "TERRAFORM_VERSION",
+			BashComplete: flora.VersionsCompletion,
 			Action: func(c *cli.Context) error {
 				if c.NArg() == 0 {
 					cli.ShowSubcommandHelp(c)
@@ -60,9 +62,10 @@ func main() {
 			},
 		},
 		{
-			Name:      "use",
-			Usage:     "Download(when it's needed) and use specific terraform version",
-			ArgsUsage: "TERRAFORM_VERSION",
+			Name:         "use",
+			Usage:        "Download(when it's needed) and use specific terraform version",
+			ArgsUsage:    "TERRAFORM_VERSION",
+			BashComplete: flora.VersionsCompletion,
 			Action: func(c *cli.Context) error {
 				version := c.Args().First()
 

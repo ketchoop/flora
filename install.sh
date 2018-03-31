@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -e
 
 function get_latest_ver() {

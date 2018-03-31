@@ -100,7 +100,13 @@ func main() {
 						currentVer, err := flora.GetCurrentVersion()
 
 						if err != nil {
-							log.Fatal(err)
+							switch err.(type) {
+							case *os.PathError:
+								fmt.Println("There is no Terraform used(linked) version")
+								return nil
+							default:
+								log.Fatal(err)
+							}
 						}
 
 						fmt.Printf("Currently used terraform version is %s\n", currentVer)

@@ -124,7 +124,7 @@ func main() {
 				}
 
 				if len(versions) == 0 && c.Bool("local") {
-					fmt.Printf("There is no packages installed locally")
+					fmt.Printf("There is no packages installed locally\n")
 
 					return nil
 				}

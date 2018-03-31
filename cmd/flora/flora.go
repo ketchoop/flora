@@ -103,7 +103,7 @@ func main() {
 							log.Fatal(err)
 						}
 
-						fmt.Println("Currently used terraform version is " + currentVer)
+						fmt.Printf("Currently used terraform version is %s\n", currentVer)
 
 						return nil
 					},
@@ -133,8 +133,14 @@ func main() {
 					versions = versions[len(versions)-c.Int("num"):]
 				}
 
+				curVer, err := flora.GetCurrentVersion()
+
 				for _, version := range versions {
-					fmt.Printf("%s\n", version)
+					if err == nil && version.Equal(curVer) {
+						fmt.Printf("> %s\n", version)
+					} else {
+						fmt.Printf("  %s\n", version)
+					}
 				}
 
 				return nil

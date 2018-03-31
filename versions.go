@@ -37,10 +37,10 @@ func GetLatestVersion() (string, error) {
 	return checkResponse.CurrentVersion, nil
 }
 
-func GetCurrentVersion() (version string, err error) {
+func GetCurrentVersion() (ver *version.Version, err error) {
 	link, err := os.Readlink(path.Join(floraPath, "bin", "terraform"))
 
-	version = link[strings.LastIndex(link, "_")+1:]
+	ver, err = version.NewVersion(link[strings.LastIndex(link, "_")+1:])
 
 	return
 }

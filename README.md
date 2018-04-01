@@ -14,7 +14,7 @@ compatible with your **.tf manifests** Terraform binary.
 
 1. By *go get*
 ```
-go get https://github.com/ketchoop/flora
+go get -u github.com/ketchoop/flora
 
 mkdir -p ~/flora/.bin
 ```

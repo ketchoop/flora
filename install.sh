@@ -13,6 +13,7 @@ function get_latest_ver() {
 function main() {
     local FLORA_DIR="$HOME/.flora"
     local DOWNLOAD_URL="https://github.com/ketchoop/flora/releases/download"
+    local INSTALL_FILES_DIR="$(mktemp -d /tmp/flora_install.XXXXXX)"
 
     local kernel="$(uname -s | tr '[:upper:]' '[:lower:]')"
     local arch="amd64"
@@ -24,7 +25,7 @@ function main() {
 
     local latest_release_download_url="$DOWNLOAD_URL/$latest_ver/flora-$latest_ver-$kernel-$arch.tar.gz"
 
-    pushd /tmp > /dev/null
+    pushd $INSTALL_FILES_DIR > /dev/null
         echo "Downloading flora $latest_ver"
         
         curl -sLO "$latest_release_download_url"
@@ -35,6 +36,10 @@ function main() {
 
         mv $kernel-$arch/flora /usr/local/bin
     popd > /dev/null
+
+    echo "Cleaning up"
+
+    rm -rf $INSTALL_FILES_DIR
 
     echo "Making flora dir: $FLORA_DIR"
 

@@ -10,6 +10,25 @@ function get_latest_ver() {
     echo "$latest_ver"
 }
 
+function install_autocompletion() {
+    case $(basename $SHELL) in
+    zsh)
+        local zsh_autocomplete_path="/usr/local/share/zsh/site-functions"
+
+        pushd "$zsh_autocomplete_path" > /dev/null
+            curl -sLO "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_zsh_autcomplete"
+        popd
+        ;;
+    bash)
+        local bash_autocomplete_path="/etc/bash_completion.d"
+
+        pushd "$bash_autocomplete_path" > /dev/null
+            curl -sLO "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_bash_autcomplete"
+        popd
+        ;;
+    esac
+}
+
 function main() {
     local FLORA_DIR="$HOME/.flora"
     local DOWNLOAD_URL="https://github.com/ketchoop/flora/releases/download"
@@ -41,6 +60,10 @@ function main() {
 
     rm -rf $INSTALL_FILES_DIR
 
+    echo "Installing autcompletion script"
+
+    install_autocompletion 
+
     echo "Making flora dir: $FLORA_DIR"
 
     mkdir -p $FLORA_DIR/bin
@@ -50,4 +73,5 @@ function main() {
     echo "export PATH=\$PATH:$FLORA_DIR/bin"
 }
 
-main
+#main
+install_autocompletion 

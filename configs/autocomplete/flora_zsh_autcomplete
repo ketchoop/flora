@@ -1,3 +1,5 @@
+#compdef flora
+
 _flora() {
 
   local -a opts
@@ -8,4 +10,4 @@ _flora() {
   return
 }
 
-compdef _flora flora
+flora

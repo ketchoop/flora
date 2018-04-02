@@ -14,7 +14,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "flora"
 	app.Usage = "Simple app to upgrade your terraform"
-	app.Version = "0.1.0"
+	app.Version = "0.1.1"
 	app.EnableBashCompletion = true
 	app.Commands = []cli.Command{
 		{

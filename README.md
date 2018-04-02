@@ -9,6 +9,12 @@ Version/upgrade manager for terraform
 You can use it to upgrade your Terraform version *by one command*. Another use case: to switch between Terraform versions to use 
 compatible with your **.tf manifests** Terraform binary.
 
+## Features
+
+* Upgrade your Terraform by one command
+* Switch between Terraform versions easy, fast and without pain
+* Bash/Zsh autocompletion. Even for versions.
+
 ## Install
 
 

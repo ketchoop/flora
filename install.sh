@@ -73,5 +73,4 @@ function main() {
     echo "export PATH=\$PATH:$FLORA_DIR/bin"
 }
 
-#main
-install_autocompletion 
+main

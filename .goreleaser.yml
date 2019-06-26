@@ -1,0 +1,46 @@
+before:
+  hooks:
+    - go mod download
+builds:
+- env:
+  - CGO_ENABLED=0
+  main: ./cmd/flora/flora.go
+  ldflags: -s -w -X main.VersionNumber={{.Version}} -X main.VersionCommitHash={{.Commit}} -X main.VersionBuildDate={{.Date}}
+  goarch:
+    - amd64
+  goos:
+    - darwin
+    - linux
+    - windows
+
+archives:
+- replacements:
+    darwin: MacOS
+    linux: Linux
+    windows: Windows
+    amd64: x86_64
+  format_overrides:
+    - goos: windows
+      format: zip
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+brews:
+- name: "flora"
+  github:
+    owner: ketchoop
+    name: homebrew-tap
+  commit_author:
+    name: changeme
+    email: changeme
+  folder: Formula
+  caveats: "flora --help"
+  homepage: "https://github.com/ketchoop/flora"
+  description: "Allows to manage and switch between multiple terraform versions"
+  custom_block: |
+    head "https://github.com/ketchoop/flora.git"
+  test: |
+    system "#{bin}/flora", "--help"
+  install: |
+    bin.install "flora"

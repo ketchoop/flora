@@ -10,11 +10,17 @@ import (
 	"github.com/urfave/cli"
 )
 
+var (
+	VersionNumber     = "Unknown" //nolint:gochecknoglobals
+	VersionCommitHash = "Unknown" //nolint:gochecknoglobals
+	VersionBuildDate  = "Unknown" //nolint:gochecknoglobals
+)
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "flora"
 	app.Usage = "Simple app to upgrade your terraform"
-	app.Version = "0.1.1"
+	app.Version = fmt.Sprintf("%s (%s at %s)", VersionNumber, VersionCommitHash, VersionBuildDate)
 	app.EnableBashCompletion = true
 	app.Commands = []cli.Command{
 		{

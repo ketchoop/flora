@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"regexp"
+	"bufio"
 
 	version "github.com/hashicorp/go-version"
 )
@@ -106,4 +108,59 @@ func ListRemoteVersions() ([]*version.Version, error) {
 	sort.Sort(version.Collection(versions))
 
 	return versions, nil
+}
+
+func getVersionConstraintFromFile(file string) string {
+	f, err := os.Open(file)
+
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	
+	re := regexp.MustCompile(`required_version[ \t]*=[ \t]*"(.*)"`)
+
+	scanner := bufio.NewScanner(f)
+	
+	for scanner.Scan() {
+		str := scanner.Text()
+		result := re.FindStringSubmatch(str)
+		if len(result) >= 2 && result[1] != "" {
+			return result[1]
+		}
+	}
+	
+	return ""
+}
+
+func GetVersionConstraint() string {
+	tfFiles, _ := filepath.Glob("*.tf")
+	for _, file := range tfFiles {
+		versionConstrains := getVersionConstraintFromFile(file)
+		if versionConstrains != "" {
+			return versionConstrains
+		}
+	}
+
+	return ""
+}
+
+func getVersionMatchingConstraint(constraintString string, versions []*version.Version) (*version.Version) {
+	constraint, _ := version.NewConstraint(constraintString)
+	for i := len(versions) - 1; i >= 0; i-- {
+		if constraint.Check(versions[i]) {
+			return versions[i]
+		}
+	}
+	return nil
+}
+
+func GetLatestVersionMatchingConstraint(versionConstraint string) string {
+	versions, _ := ListRemoteVersions()
+	version := getVersionMatchingConstraint(versionConstraint, versions)
+	if version == nil {
+		return ""
+	}
+
+	return version.String()
 }

@@ -46,23 +46,32 @@ func main() {
 			ArgsUsage:    "TERRAFORM_VERSION",
 			BashComplete: flora.VersionsCompletion,
 			Action: func(c *cli.Context) error {
-				if c.NArg() == 0 {
-					cli.ShowSubcommandHelp(c)
+				versionConstraint := c.Args().First()
 
+				if versionConstraint == "" {
+					versionConstraint = flora.GetVersionConstraint()
+					
+					if versionConstraint == "" {
+						cli.ShowSubcommandHelp(c)
+						return nil
+					}
+				}
+
+				versionStr := flora.GetLatestVersionMatchingConstraint(versionConstraint)
+				if versionStr == "" {
+					log.Printf("Can't find version matching constraint %s\n", versionConstraint)
 					return nil
 				}
 
-				version := c.Args().First()
+				upgrader := flora.TerraformUpgrader{versionStr}
 
-				upgrader := flora.TerraformUpgrader{version}
-
-				log.Print("Downloading Terraform " + version)
+				log.Print("Downloading Terraform " + versionStr)
 
 				if err := upgrader.DownloadTerraform(); err != nil {
 					log.Fatal(err)
 				}
 
-				log.Print("Terraform " + version + " was succesfully downloaded")
+				log.Print("Terraform " + versionStr + " was succesfully downloaded")
 
 				return nil
 			},
@@ -73,15 +82,24 @@ func main() {
 			ArgsUsage:    "TERRAFORM_VERSION",
 			BashComplete: flora.VersionsCompletion,
 			Action: func(c *cli.Context) error {
-				version := c.Args().First()
+				versionConstraint := c.Args().First()
 
-				if version == "" {
-					cli.ShowCommandHelp(c, c.Command.Name)
+				if versionConstraint == "" {
+					versionConstraint = flora.GetVersionConstraint()
+					
+					if versionConstraint == "" {
+						cli.ShowCommandHelp(c, c.Command.Name)
+						return nil
+					}
+				}
+
+				versionStr := flora.GetLatestVersionMatchingConstraint(versionConstraint)
+				if versionStr == "" {
+					log.Printf("Can't find version matching constarint %s\n", versionConstraint)
 					return nil
 				}
 
-				upgrader := flora.TerraformUpgrader{version}
-
+				upgrader := flora.TerraformUpgrader{versionStr}
 				upgrader.Run()
 
 				return nil

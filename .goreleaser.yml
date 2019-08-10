@@ -32,8 +32,8 @@ brews:
     owner: ketchoop
     name: homebrew-tap
   commit_author:
-    name: changeme
-    email: changeme
+    name: ketchoop
+    email: ket4yiit@gmail.com
   folder: Formula
   caveats: "flora --help"
   homepage: "https://github.com/ketchoop/flora"

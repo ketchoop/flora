@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 function get_latest_ver() {
     local latest_release_info="$(curl -s https://api.github.com/repos/ketchoop/flora/releases/latest)"
@@ -41,8 +41,9 @@ function main() {
     echo "Getting latest version tag"
 
     local latest_ver="$(get_latest_ver)"
+    echo "$latest_ver"
 
-    local latest_release_download_url="$DOWNLOAD_URL/$latest_ver/flora-$latest_ver-$kernel-$arch.tar.gz"
+    local latest_release_download_url="${DOWNLOAD_URL}/${latest_ver}/flora_${latest_ver}_${kernel}_${arch}.tar.gz"
 
     pushd $INSTALL_FILES_DIR > /dev/null
         echo "Downloading flora $latest_ver"
@@ -51,9 +52,9 @@ function main() {
 
         echo "Unpacking "
 
-        tar -xzf flora-$latest_ver-$kernel-$arch.tar.gz
+        tar -xzf "flora_${latest_ver}_${kernel}_${arch}.tar.gz"
 
-        mv $kernel-$arch/flora /usr/local/bin
+        mv flora /usr/local/bin
     popd > /dev/null
 
     echo "Cleaning up"

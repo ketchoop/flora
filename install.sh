@@ -16,7 +16,7 @@ function install_autocompletion() {
         local zsh_autocomplete_path="/usr/local/share/zsh/site-functions"
 
         pushd "$zsh_autocomplete_path" > /dev/null
-            curl -sLO "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_zsh_autcomplete"
+            curl -sL "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_zsh_autcomplete" -o _flora
         popd
         ;;
     bash)

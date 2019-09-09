@@ -5,7 +5,6 @@ package flora
 import (
 	"archive/zip"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,13 +29,14 @@ func unzip(src, dest string) ([]string, error) {
 		defer rc.Close()
 
 		// Store filename/path for returning and using later on
-		fpath := filepath.Join(dest, f.Name)
+		fpath := filepath.Join(dest, f.Name) //nolint:gosec
 		filenames = append(filenames, fpath)
 
 		if f.FileInfo().IsDir() {
-
 			// Make Folder
-			os.MkdirAll(fpath, os.ModePerm)
+			if err = os.MkdirAll(fpath, os.ModePerm); err != nil {
+				return nil, err
+			}
 
 		} else {
 
@@ -48,7 +48,6 @@ func unzip(src, dest string) ([]string, error) {
 
 			err = os.MkdirAll(fdir, os.ModePerm)
 			if err != nil {
-				log.Fatal(err)
 				return filenames, err
 			}
 			f, err := os.OpenFile(

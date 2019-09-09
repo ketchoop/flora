@@ -9,8 +9,6 @@ import (
 	"os"
 	"path"
 	"runtime"
-
-	homedir "github.com/mitchellh/go-homedir"
 )
 
 const (
@@ -18,20 +16,13 @@ const (
 	tfCheckpointURL string = "https://checkpoint-api.hashicorp.com/v1/check/terraform"
 )
 
-var floraPath string
-
-func init() {
-	homeDir, _ := homedir.Dir()
-
-	floraPath = path.Join(homeDir, ".flora")
-}
-
 type TerraformUpgrader struct {
-	Version string
+	Version   string
+	FloraPath string
 }
 
 func (t TerraformUpgrader) IsDownloadNeeded() bool {
-	_, err := os.Stat(floraPath + "/terraform_" + t.Version)
+	_, err := os.Stat(t.FloraPath + "/terraform_" + t.Version)
 
 	return os.IsNotExist(err)
 }
@@ -39,7 +30,7 @@ func (t TerraformUpgrader) IsDownloadNeeded() bool {
 func (t TerraformUpgrader) DownloadTerraform() error {
 	tfFileURL := fmt.Sprintf(tfBaseURL, t.Version, t.Version+"_"+runtime.GOOS+"_"+runtime.GOARCH)
 
-	r, err := http.Get(tfFileURL)
+	r, err := http.Get(tfFileURL) //nolint:gosec
 
 	if err != nil {
 		return err
@@ -49,7 +40,7 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 		return errors.New("can't download terraform")
 	}
 
-	zipFile, err := os.Create(path.Join(floraPath, "terraform_"+t.Version+".zip")) // use pathlib
+	zipFile, err := os.Create(path.Join(t.FloraPath, "terraform_"+t.Version+".zip")) // use pathlib
 
 	if err != nil {
 		return err
@@ -69,31 +60,33 @@ func (t TerraformUpgrader) DownloadTerraform() error {
 }
 
 func (t TerraformUpgrader) UnzipAndClean() error {
-	_, err := unzip(path.Join(floraPath, "terraform_"+t.Version+".zip"), floraPath)
+	_, err := unzip(path.Join(t.FloraPath, "terraform_"+t.Version+".zip"), t.FloraPath)
 
 	if err != nil {
 		return err
 	}
 
-	if err = os.Remove(path.Join(floraPath, "terraform_"+t.Version+".zip")); err != nil {
+	if err := os.Remove(path.Join(t.FloraPath, "terraform_"+t.Version+".zip")); err != nil {
 		return err
 	}
 
-	os.Rename(path.Join(floraPath, "terraform"), path.Join(floraPath, "terraform_"+t.Version))
+	if err := os.Rename(path.Join(t.FloraPath, "terraform"), path.Join(t.FloraPath, "terraform_"+t.Version)); err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func (t TerraformUpgrader) InstallNewTerraform() error {
-	floraBinPath := path.Join(floraPath, "bin", "terraform")
+	floraBinPath := path.Join(t.FloraPath, "bin", "terraform")
 
 	if _, err := os.Lstat(floraBinPath); err == nil {
 		os.Remove(floraBinPath)
 	}
 
-	log.Print("Adding symlink " + path.Join(floraPath, "terraform_"+t.Version) + "->" + floraBinPath)
+	log.Print("Adding symlink " + path.Join(t.FloraPath, "terraform_"+t.Version) + "->" + floraBinPath)
 
-	if err := os.Symlink(path.Join(floraPath, "terraform_"+t.Version), floraBinPath); err != nil {
+	if err := os.Symlink(path.Join(t.FloraPath, "terraform_"+t.Version), floraBinPath); err != nil {
 		return err
 	}
 
@@ -119,7 +112,7 @@ func (t TerraformUpgrader) Run() error {
 		log.Fatal(err)
 	}
 
-	log.Print("Terraform " + t.Version + " was succesfully installed")
+	log.Print("Terraform " + t.Version + " was successfully installed")
 
 	return nil
 }

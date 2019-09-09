@@ -1,15 +1,15 @@
 package flora
 
 import (
+	"bufio"
 	"encoding/json"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
-	"regexp"
-	"bufio"
 
 	version "github.com/hashicorp/go-version"
 )
@@ -39,7 +39,7 @@ func GetLatestVersion() (string, error) {
 	return checkResponse.CurrentVersion, nil
 }
 
-func GetCurrentVersion() (ver *version.Version, err error) {
+func GetCurrentVersion(floraPath string) (ver *version.Version, err error) {
 	link, err := os.Readlink(path.Join(floraPath, "bin", "terraform"))
 
 	if err != nil {
@@ -51,7 +51,7 @@ func GetCurrentVersion() (ver *version.Version, err error) {
 	return
 }
 
-func ListLocalVersions() ([]*version.Version, error) {
+func ListLocalVersions(floraPath string) ([]*version.Version, error) {
 	var versions []*version.Version
 	var rawVersions []string
 
@@ -117,11 +117,11 @@ func getVersionConstraintFromFile(file string) string {
 		return ""
 	}
 	defer f.Close()
-	
+
 	re := regexp.MustCompile(`required_version[ \t]*=[ \t]*"(.*)"`)
 
 	scanner := bufio.NewScanner(f)
-	
+
 	for scanner.Scan() {
 		str := scanner.Text()
 		result := re.FindStringSubmatch(str)
@@ -129,7 +129,7 @@ func getVersionConstraintFromFile(file string) string {
 			return result[1]
 		}
 	}
-	
+
 	return ""
 }
 
@@ -145,7 +145,7 @@ func GetVersionConstraint() string {
 	return ""
 }
 
-func getVersionMatchingConstraint(constraintString string, versions []*version.Version) (*version.Version) {
+func getVersionMatchingConstraint(constraintString string, versions []*version.Version) *version.Version {
 	constraint, _ := version.NewConstraint(constraintString)
 	for i := len(versions) - 1; i >= 0; i-- {
 		if constraint.Check(versions[i]) {
@@ -157,10 +157,10 @@ func getVersionMatchingConstraint(constraintString string, versions []*version.V
 
 func GetLatestVersionMatchingConstraint(versionConstraint string) string {
 	versions, _ := ListRemoteVersions()
-	version := getVersionMatchingConstraint(versionConstraint, versions)
-	if version == nil {
+	tfVersion := getVersionMatchingConstraint(versionConstraint, versions)
+	if tfVersion == nil {
 		return ""
 	}
 
-	return version.String()
+	return tfVersion.String()
 }

@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 
 	version "github.com/hashicorp/go-version"
 	"github.com/ketchoop/flora"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/urfave/cli"
 )
 
@@ -16,7 +18,7 @@ var (
 	VersionBuildDate  = "Unknown" //nolint:gochecknoglobals
 )
 
-func main() {
+func main() { //nolint:gocyclo
 	app := cli.NewApp()
 	app.Name = "flora"
 	app.Usage = "Simple app to upgrade your terraform"
@@ -27,15 +29,20 @@ func main() {
 			Name:  "upgrade",
 			Usage: "Upgrade terraform",
 			Action: func(c *cli.Context) error {
-				version, err := flora.GetLatestVersion()
+				tfVersion, err := flora.GetLatestVersion()
 
 				if err != nil {
 					log.Fatal(err)
 				}
 
-				upgrader := flora.TerraformUpgrader{version}
+				homeDir, _ := homedir.Dir()
+				floraPath := path.Join(homeDir, ".flora")
 
-				upgrader.Run()
+				upgrader := flora.TerraformUpgrader{Version: tfVersion, FloraPath: floraPath}
+
+				if err := upgrader.Run(); err != nil {
+					log.Fatal(err)
+				}
 
 				return nil
 			},
@@ -50,28 +57,33 @@ func main() {
 
 				if versionConstraint == "" {
 					versionConstraint = flora.GetVersionConstraint()
-					
+
 					if versionConstraint == "" {
-						cli.ShowSubcommandHelp(c)
+						if err := cli.ShowSubcommandHelp(c); err != nil {
+							log.Fatal(err)
+						}
 						return nil
 					}
 				}
 
-				versionStr := flora.GetLatestVersionMatchingConstraint(versionConstraint)
-				if versionStr == "" {
+				tfVersion := flora.GetLatestVersionMatchingConstraint(versionConstraint)
+				if tfVersion == "" {
 					log.Printf("Can't find version matching constraint %s\n", versionConstraint)
 					return nil
 				}
 
-				upgrader := flora.TerraformUpgrader{versionStr}
+				homeDir, _ := homedir.Dir()
+				floraPath := path.Join(homeDir, ".flora")
 
-				log.Print("Downloading Terraform " + versionStr)
+				upgrader := flora.TerraformUpgrader{Version: tfVersion, FloraPath: floraPath}
+
+				log.Print("Downloading Terraform " + tfVersion)
 
 				if err := upgrader.DownloadTerraform(); err != nil {
 					log.Fatal(err)
 				}
 
-				log.Print("Terraform " + versionStr + " was succesfully downloaded")
+				log.Print("Terraform " + tfVersion + " was successfully downloaded")
 
 				return nil
 			},
@@ -86,21 +98,29 @@ func main() {
 
 				if versionConstraint == "" {
 					versionConstraint = flora.GetVersionConstraint()
-					
+
 					if versionConstraint == "" {
-						cli.ShowCommandHelp(c, c.Command.Name)
+						if err := cli.ShowCommandHelp(c, c.Command.Name); err != nil {
+							log.Fatal(err)
+						}
 						return nil
 					}
 				}
 
-				versionStr := flora.GetLatestVersionMatchingConstraint(versionConstraint)
-				if versionStr == "" {
+				tfVersion := flora.GetLatestVersionMatchingConstraint(versionConstraint)
+				if tfVersion == "" {
 					log.Printf("Can't find version matching constarint %s\n", versionConstraint)
 					return nil
 				}
 
-				upgrader := flora.TerraformUpgrader{versionStr}
-				upgrader.Run()
+				homeDir, _ := homedir.Dir()
+				floraPath := path.Join(homeDir, ".flora")
+
+				upgrader := flora.TerraformUpgrader{Version: tfVersion, FloraPath: floraPath}
+
+				if err := upgrader.Run(); err != nil {
+					log.Fatal(err)
+				}
 
 				return nil
 			},
@@ -124,7 +144,11 @@ func main() {
 					Name:  "current",
 					Usage: "Show currently used version of terraform",
 					Action: func(c *cli.Context) error {
-						currentVer, err := flora.GetCurrentVersion()
+
+						homeDir, _ := homedir.Dir()
+						floraPath := path.Join(homeDir, ".flora")
+
+						currentVer, err := flora.GetCurrentVersion(floraPath)
 
 						if err != nil {
 							switch err.(type) {
@@ -146,8 +170,11 @@ func main() {
 				var versions []*version.Version
 				var err error
 
+				homeDir, _ := homedir.Dir()
+				floraPath := path.Join(homeDir, ".flora")
+
 				if c.Bool("local") {
-					versions, err = flora.ListLocalVersions()
+					versions, err = flora.ListLocalVersions(floraPath)
 				} else {
 					versions, err = flora.ListRemoteVersions()
 				}
@@ -166,7 +193,7 @@ func main() {
 					versions = versions[len(versions)-c.Int("num"):]
 				}
 
-				curVer, err := flora.GetCurrentVersion()
+				curVer, err := flora.GetCurrentVersion(floraPath)
 
 				for _, version := range versions {
 					if err == nil && version.Equal(curVer) {
@@ -181,5 +208,7 @@ func main() {
 		},
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
 }

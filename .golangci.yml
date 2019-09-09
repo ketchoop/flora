@@ -23,8 +23,8 @@ linters-settings:
     # ignore-words:
     #   - someword
   gocritic:
-    # disabled-checks:
-    #   - wrapperFunc
+    disabled-checks:
+    - sloppyReassign
     enabled-tags:
       - performance
       - style

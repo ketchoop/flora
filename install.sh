@@ -16,14 +16,14 @@ function install_autocompletion() {
         local zsh_autocomplete_path="/usr/local/share/zsh/site-functions"
 
         pushd "$zsh_autocomplete_path" > /dev/null
-            curl -sL "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_zsh_autcomplete" -o _flora
+            curl -sL "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_zsh_autocomplete" -o _flora
         popd
         ;;
     bash)
         local bash_autocomplete_path="/etc/bash_completion.d"
 
         pushd "$bash_autocomplete_path" > /dev/null
-            curl -sLO "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_bash_autcomplete"
+            curl -sLO "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_bash_autocomplete"
         popd
         ;;
     esac

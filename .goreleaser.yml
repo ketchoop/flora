@@ -12,6 +12,11 @@ builds:
     - darwin
     - linux
 
+archives:
+  - files:
+      - configs/autocomplete/*
+      - LICENSE
+
 checksum:
   name_template: 'checksums.txt'
   algorithm: sha256
@@ -28,9 +33,19 @@ brews:
   caveats: "flora --help"
   homepage: "https://github.com/ketchoop/flora"
   description: "Allows to manage and switch between multiple terraform versions"
+  conflicts:
+    - terraform
   custom_block: |
     head "https://github.com/ketchoop/flora.git"
   test: |
     system "#{bin}/flora", "--help"
   install: |
+    case File.basename(ENV["SHELL"])
+    when "zsh"
+    zsh_completion.install "configs/autocomplete/flora_zsh_autocomplete" => "_flora"
+    when "bash"
+      url "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_bash_autocomplete"
+      bash_completion.install "configs/autocomplete/flora_bash_autocomplete" => "_flora"
+    end
+
     bin.install "flora"

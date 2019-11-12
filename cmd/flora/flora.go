@@ -18,7 +18,8 @@ var (
 	VersionBuildDate  = "Unknown" //nolint:gochecknoglobals
 )
 
-func main() { //nolint:gocyclo
+//nolint:gocyclo,funlen
+func main() {
 	app := cli.NewApp()
 	app.Name = "flora"
 	app.Usage = "Simple app to upgrade your terraform"
@@ -144,7 +145,6 @@ func main() { //nolint:gocyclo
 					Name:  "current",
 					Usage: "Show currently used version of terraform",
 					Action: func(c *cli.Context) error {
-
 						homeDir, _ := homedir.Dir()
 						floraPath := path.Join(homeDir, ".flora")
 

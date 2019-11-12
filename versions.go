@@ -100,6 +100,7 @@ func ListRemoteVersions() ([]*version.Version, error) {
 	versions = make([]*version.Version, len(versionsWrapper.Versions))
 
 	i := 0
+
 	for ver := range versionsWrapper.Versions {
 		versions[i], _ = version.NewVersion(ver)
 		i++
@@ -158,6 +159,7 @@ func getVersionMatchingConstraint(constraintString string, versions []*version.V
 func GetLatestVersionMatchingConstraint(versionConstraint string) string {
 	versions, _ := ListRemoteVersions()
 	tfVersion := getVersionMatchingConstraint(versionConstraint, versions)
+
 	if tfVersion == nil {
 		return ""
 	}

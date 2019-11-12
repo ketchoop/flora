@@ -11,21 +11,23 @@ import (
 )
 
 func unzip(src, dest string) ([]string, error) {
-
 	var filenames []string
 
 	r, err := zip.OpenReader(src)
+
 	if err != nil {
 		return filenames, err
 	}
+
 	defer r.Close()
 
 	for _, f := range r.File {
-
 		rc, err := f.Open()
+
 		if err != nil {
 			return filenames, err
 		}
+
 		defer rc.Close()
 
 		// Store filename/path for returning and using later on
@@ -37,9 +39,7 @@ func unzip(src, dest string) ([]string, error) {
 			if err = os.MkdirAll(fpath, os.ModePerm); err != nil {
 				return nil, err
 			}
-
 		} else {
-
 			// Make File
 			var fdir string
 			if lastIndex := strings.LastIndex(fpath, string(os.PathSeparator)); lastIndex > -1 {
@@ -61,8 +61,8 @@ func unzip(src, dest string) ([]string, error) {
 			if err != nil {
 				return filenames, err
 			}
-
 		}
 	}
+
 	return filenames, nil
 }

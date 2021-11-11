@@ -21,14 +21,14 @@ compatible with your **.tf manifests** Terraform binary.
 ```
 brew install ketchoop/homebrew-tap/flora
 
-mkdir -p ~/flora/.bin
+mkdir -p ~/.flora/.bin
 ```
 
 2. By *go get*
 ```
 go get -u github.com/ketchoop/flora/cmd/flora
 
-mkdir -p ~/flora/.bin
+mkdir -p ~/.flora/.bin
 ```
 
 3. By install.sh

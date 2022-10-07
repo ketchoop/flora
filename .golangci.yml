@@ -1,5 +1,7 @@
 run:
   modules-download-mode: readonly
+  skip-files:
+    - unzip.go
 
 # all available settings of specific linters
 linters-settings:
@@ -34,6 +36,7 @@ linters:
   enable-all: true
   disable:
   - maligned
-  - prealloc
   - wsl
   - gocognit
+  - gofumpt
+  - varnamelen

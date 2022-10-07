@@ -24,7 +24,7 @@ checksum:
 
 brews:
 - name: "flora"
-  github:
+  tap:
     owner: ketchoop
     name: homebrew-tap
   commit_author:

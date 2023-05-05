@@ -41,12 +41,7 @@ brews:
   test: |
     system "#{bin}/flora", "--help"
   install: |
-    case File.basename(ENV["SHELL"])
-    when "zsh"
     zsh_completion.install "configs/autocomplete/flora_zsh_autocomplete" => "_flora"
-    when "bash"
-      url "https://raw.githubusercontent.com/ketchoop/flora/master/configs/autocomplete/flora_bash_autocomplete"
-      bash_completion.install "configs/autocomplete/flora_bash_autocomplete" => "_flora"
-    end
+    bash_completion.install "configs/autocomplete/flora_bash_autocomplete" => "_flora"
 
     bin.install "flora"
